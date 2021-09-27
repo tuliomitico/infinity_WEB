@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useCallback } from 'react'
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -13,6 +13,9 @@ import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import AuthService from '../../services/AuthService'
+import { history, SignUpCredentials } from '../../hooks/auth'
 
 function Copyright(props: any) {
   return (
@@ -34,15 +37,26 @@ function Copyright(props: any) {
 
 const theme = createTheme()
 
-export default function Register(): JSX.Element {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password')
-    })
+const Register: React.FC = () => {
+  const { register, handleSubmit } = useForm()
+  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault()
+  //   const data = new FormData(event.currentTarget)
+  //   // eslint-disable-next-line no-console
+  //   console.log({
+  //     email: data.get('email'),
+  //     password: data.get('password')
+  //   })
+  // }
+  const signUp = useCallback(
+    async ({ username, email, cpf, telephone, password }) => {
+      await AuthService.signUp({ username, email, cpf, telephone, password })
+    },
+    []
+  )
+  const handleSignUp = async (data: SignUpCredentials) => {
+    await signUp(data)
+    history.push('/')
   }
 
   return (
@@ -61,38 +75,52 @@ export default function Register(): JSX.Element {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Cadastro
           </Typography>
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(handleSignUp)}
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  {...register('username')}
                   autoComplete="fname"
-                  name="userName"
+                  name="username"
                   required
                   fullWidth
                   id="userName"
-                  label="User Name"
+                  label="Nome de usuário"
                   autoFocus
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  {...register('cpf')}
                   required
                   fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="lname"
+                  id="cpf"
+                  label="CPF"
+                  name="cpf"
+                  autoComplete="cpf"
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  {...register('telephone')}
+                  required
+                  fullWidth
+                  name="telephone"
+                  label="Telefone"
+                  id="telephone"
+                  autoComplete="telephone"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  {...register('email')}
                   required
                   fullWidth
                   id="email"
@@ -103,21 +131,14 @@ export default function Register(): JSX.Element {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  {...register('password')}
                   required
                   fullWidth
-                  name="senha"
-                  label="senha"
+                  name="password"
+                  label="Senha"
                   type="password"
                   id="senha"
                   autoComplete="senha"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox value="allowExtraEmails" color="primary" />
-                  }
-                  label="I want to receive inspiration, marketing promotions and updates via email."
                 />
               </Grid>
             </Grid>
@@ -126,14 +147,12 @@ export default function Register(): JSX.Element {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              to={'/'}
-              component={NavLink}
             >
-              Sign Up
+              Cadastrar
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="#" variant="body2" to="/" component={NavLink}>
                   Already have an account? Sign in
                 </Link>
               </Grid>
@@ -145,3 +164,5 @@ export default function Register(): JSX.Element {
     </ThemeProvider>
   )
 }
+
+export default Register

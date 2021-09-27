@@ -13,6 +13,8 @@ import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { useForm } from 'react-hook-form'
+import { SignInCredentials, useAuth } from '../../hooks/auth'
 
 const Copyright = (props: any) => {
   return (
@@ -35,15 +37,21 @@ const Copyright = (props: any) => {
 const theme = createTheme()
 
 const Login: React.FC = () => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password')
-    })
+  const { signIn } = useAuth()
+  const { register, handleSubmit } = useForm()
+  const handleLogin = async (data: SignInCredentials) => {
+    console.debug('Login', data)
+    await signIn(data)
   }
+  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault()
+  //   const data = new FormData(event.currentTarget)
+  //   // eslint-disable-next-line no-console
+  //   console.log({
+  //     email: data.get('email'),
+  //     password: data.get('password')
+  //   })
+  // }
 
   return (
     <ThemeProvider theme={theme}>
@@ -65,21 +73,23 @@ const Login: React.FC = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(handleLogin)}
             noValidate
             sx={{ mt: 1 }}
           >
             <TextField
+              {...register('username')}
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Endereço de Email"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Nome de Usuário"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField
+              {...register('password')}
               margin="normal"
               required
               fullWidth
@@ -102,11 +112,6 @@ const Login: React.FC = () => {
               Entrar
             </Button>
             <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Esqueceu a senha?
-                </Link>
-              </Grid>
               <Grid item>
                 <Link
                   href="#"
