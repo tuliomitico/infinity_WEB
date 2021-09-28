@@ -13,10 +13,12 @@ import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
-import Link from '@mui/material/Link'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import api from '../../services/api'
 
+import api from '../../services/api'
+import { NavLink } from 'react-router-dom'
+import { useAuth } from '../../hooks/auth'
+import Copyright from '../../components/Copyright'
 interface IStore {
   id: number
   name: string
@@ -28,24 +30,10 @@ interface IStore {
   category: string
 }
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Infinity Challenge
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
-
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 const theme = createTheme()
 
 const Store: React.FC = () => {
+  const { user, signOut } = useAuth()
   const [data, setData] = useState([] as IStore[])
 
   async function loadData() {
@@ -101,8 +89,21 @@ const Store: React.FC = () => {
               spacing={2}
               justifyContent="center"
             >
-              <Button variant="contained">Login</Button>
-              <Button variant="outlined">Cadastre-se</Button>
+              {user ? (
+                <Typography>Olá,{user}</Typography>
+              ) : (
+                <Button variant="contained" to="/login" component={NavLink}>
+                  Login
+                </Button>
+              )}
+              <Button variant="outlined" to="/register" component={NavLink}>
+                Cadastre-se
+              </Button>
+              {user ? (
+                <Button size="small" onClick={signOut}>
+                  Logout
+                </Button>
+              ) : null}
             </Stack>
           </Container>
         </Box>

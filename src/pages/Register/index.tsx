@@ -14,46 +14,23 @@ import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+
 import AuthService from '../../services/AuthService'
 import { history, SignUpCredentials } from '../../hooks/auth'
-
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
+import Copyright from '../../components/Copyright'
 
 const theme = createTheme()
 
 const Register: React.FC = () => {
   const { register, handleSubmit } = useForm()
-  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault()
-  //   const data = new FormData(event.currentTarget)
-  //   // eslint-disable-next-line no-console
-  //   console.log({
-  //     email: data.get('email'),
-  //     password: data.get('password')
-  //   })
-  // }
+
   const signUp = useCallback(
     async ({ username, email, cpf, telephone, password }) => {
       await AuthService.signUp({ username, email, cpf, telephone, password })
     },
     []
   )
+
   const handleSignUp = async (data: SignUpCredentials) => {
     await signUp(data)
     history.push('/')
@@ -152,7 +129,7 @@ const Register: React.FC = () => {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2" to="/" component={NavLink}>
+                <Link href="#" variant="body2" to="/login" component={NavLink}>
                   Already have an account? Sign in
                 </Link>
               </Grid>

@@ -16,6 +16,7 @@ export interface SignUpCredentials {
 }
 
 interface AuthContextData {
+  user: string | null
   authenticated: boolean
   signIn(data: SignInCredentials): Promise<void>
   signOut(): void
@@ -26,38 +27,45 @@ const AuthContext = createContext({} as AuthContextData)
 export const history = createBrowserHistory()
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const [authenticated, setAuthenticated] = useState(false)
+  const [user, setUser] = useState('')
   const [loading, setLoading] = useState(true)
+  const authenticated = !!user
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-
+    const user = localStorage.getItem('user')
     if (token) {
       api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`
-      setAuthenticated(true)
+      setUser(user || '')
     }
 
     setLoading(false)
   }, [])
   const signIn = async (data: SignInCredentials) => {
     const {
-      data: { access: token }
+      data: { access: token, username, refresh }
     } = await AuthService.signIn(data)
     localStorage.setItem('token', JSON.stringify(token))
+    localStorage.setItem('refresh', JSON.stringify(refresh))
+    localStorage.setItem('user', username)
     api.defaults.headers.Authorization = `Bearer ${token}`
-    setAuthenticated(true)
-    history.push('/register')
+    setUser(username)
+    history.push('/')
   }
 
   const signOut = () => {
-    setAuthenticated(false)
     localStorage.removeItem('token')
+    localStorage.removeItem('refresh')
+    localStorage.removeItem('user')
+    setUser('')
     api.defaults.headers.Authorization = undefined
     history.push('/')
   }
 
   return (
-    <AuthContext.Provider value={{ authenticated, signIn, signOut, loading }}>
+    <AuthContext.Provider
+      value={{ user, authenticated, signIn, signOut, loading }}
+    >
       {children}
     </AuthContext.Provider>
   )

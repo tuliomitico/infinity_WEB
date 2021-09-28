@@ -14,25 +14,9 @@ import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { useForm } from 'react-hook-form'
-import { SignInCredentials, useAuth } from '../../hooks/auth'
 
-const Copyright = (props: any) => {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Infinity Challenge
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
+import { SignInCredentials, useAuth } from '../../hooks/auth'
+import Copyright from '../../components/Copyright'
 
 const theme = createTheme()
 
