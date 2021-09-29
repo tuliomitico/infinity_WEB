@@ -14,14 +14,16 @@ import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { useHistory } from 'react-router'
 
 import AuthService from '../../services/AuthService'
-import { history, SignUpCredentials } from '../../hooks/auth'
+import { SignUpCredentials } from '../../hooks/auth'
 import Copyright from '../../components/Copyright'
 
 const theme = createTheme()
 
 const Register: React.FC = () => {
+  const history = useHistory()
   const { register, handleSubmit } = useForm()
 
   const signUp = useCallback(

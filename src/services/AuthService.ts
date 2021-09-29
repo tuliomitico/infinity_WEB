@@ -7,7 +7,12 @@ interface IUser {
 }
 
 export interface ITokenData {
-  data: { access: string; refresh: string; username: string }
+  data: {
+    access: string
+    refresh: string
+    username: string
+    id: string
+  }
 }
 
 class AuthService {

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import api from '../services/api'
 import AuthService from '../services/AuthService'
-import { createBrowserHistory } from 'history'
+import { useHistory } from 'react-router'
 export interface SignInCredentials {
   username: string
   password: string
@@ -17,6 +17,7 @@ export interface SignUpCredentials {
 
 interface AuthContextData {
   user: string | null
+  userId: string | null
   authenticated: boolean
   signIn(data: SignInCredentials): Promise<void>
   signOut(): void
@@ -24,47 +25,53 @@ interface AuthContextData {
 }
 
 const AuthContext = createContext({} as AuthContextData)
-export const history = createBrowserHistory()
 
 export const AuthProvider: React.FC = ({ children }) => {
+  const history = useHistory()
   const [user, setUser] = useState('')
+  const [userId, setUserId] = useState('')
   const [loading, setLoading] = useState(true)
   const authenticated = !!user
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     const user = localStorage.getItem('user')
+    const id = localStorage.getItem('id')
     if (token) {
       api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`
       setUser(user || '')
+      setUserId(id || '')
     }
 
     setLoading(false)
   }, [])
   const signIn = async (data: SignInCredentials) => {
     const {
-      data: { access: token, username, refresh }
+      data: { access: token, username, refresh, id }
     } = await AuthService.signIn(data)
     localStorage.setItem('token', JSON.stringify(token))
     localStorage.setItem('refresh', JSON.stringify(refresh))
     localStorage.setItem('user', username)
+    localStorage.setItem('id', id)
     api.defaults.headers.Authorization = `Bearer ${token}`
     setUser(username)
-    history.push('/')
+    setUserId(id)
+    window.location.href = '/'
   }
 
   const signOut = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('refresh')
     localStorage.removeItem('user')
+    localStorage.removeItem('id')
     setUser('')
+    setUserId('')
     api.defaults.headers.Authorization = undefined
-    history.push('/')
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, authenticated, signIn, signOut, loading }}
+      value={{ user, userId, authenticated, signIn, signOut, loading }}
     >
       {children}
     </AuthContext.Provider>

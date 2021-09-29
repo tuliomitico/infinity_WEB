@@ -11,8 +11,9 @@ api.interceptors.response.use(
   response => response,
   async (error: any) => {
     const originalRequest = error.config
-    const refreshToken = JSON.parse(localStorage.getItem('refresh') || '')
-    console.log(refreshToken)
+    const refreshT = localStorage.getItem('refresh')
+    console.log(refreshT)
+    const refreshToken = refreshT ? JSON.parse(refreshT) : null
 
     if (
       error.response?.status === 401 &&
@@ -21,9 +22,8 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true
       const response = await AuthService.getNewToken({ refresh: refreshToken })
-      const { access: token, refresh } = response.data
+      const { access: token } = response.data
       localStorage.setItem('token', JSON.stringify(token))
-      localStorage.setItem('refresh', JSON.stringify(refresh))
       api.defaults.headers.Authorization = `Bearer ${token}`
       return api(originalRequest)
     }

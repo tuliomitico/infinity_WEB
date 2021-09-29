@@ -11,15 +11,18 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
+import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { Add } from '@mui/icons-material'
+import { NavLink, useHistory } from 'react-router-dom'
 
 import api from '../../services/api'
-import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/auth'
 import Copyright from '../../components/Copyright'
-interface IStore {
+import SearchBar from '../../utils/SearchBar'
+export interface IStore {
   id: number
   name: string
   description: string
@@ -28,14 +31,25 @@ interface IStore {
   lng: number
   logotype: File | string
   category: string
+  // eslint-disable-next-line camelcase
+  owner_id: number
 }
 
 const theme = createTheme()
 
-const Store: React.FC = () => {
+const Stores: React.FC = () => {
+  const history = useHistory()
   const { user, signOut } = useAuth()
   const [data, setData] = useState([] as IStore[])
+  const [word, setWord] = useState({ search: '' })
 
+  const goSearch = (e: unknown) => {
+    history.push({
+      pathname: '/search/',
+      search: '?search=' + word.search
+    })
+    window.location.reload()
+  }
   async function loadData() {
     const response = await api.get('/store/')
     setData(response.data)
@@ -53,6 +67,12 @@ const Store: React.FC = () => {
           <Typography variant="h6" color="black" noWrap>
             Lojas cadastradas
           </Typography>
+          <SearchBar
+            value={word.search}
+            onChange={newValue => setWord({ search: newValue })}
+            onRequestSearch={() => goSearch(word.search)}
+            onCancelSearch={() => null}
+          />
         </Toolbar>
       </AppBar>
       <main>
@@ -100,9 +120,17 @@ const Store: React.FC = () => {
                 Cadastre-se
               </Button>
               {user ? (
-                <Button size="small" onClick={signOut}>
-                  Logout
-                </Button>
+                <>
+                  <Button size="small" onClick={signOut}>
+                    Logout
+                  </Button>
+                  <Link to="/store" component={NavLink}>
+                    <Add /> Adicionar Loja
+                  </Link>
+                  <Button variant="outlined" to="/edit" component={NavLink}>
+                    Editar Perfil
+                  </Button>
+                </>
               ) : null}
             </Stack>
           </Container>
@@ -135,7 +163,13 @@ const Store: React.FC = () => {
                     <Typography>{card.description}</Typography>
                   </CardContent>
                   <CardActions>
-                    <Button size="small">Ver</Button>
+                    <Button
+                      size="small"
+                      to={'/store/' + card.slug + '/'}
+                      component={NavLink}
+                    >
+                      Ver
+                    </Button>
                     <Button size="small">Editar</Button>
                   </CardActions>
                 </Card>
@@ -164,4 +198,4 @@ const Store: React.FC = () => {
   )
 }
 
-export default Store
+export default Stores

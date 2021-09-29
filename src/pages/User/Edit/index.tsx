@@ -10,39 +10,22 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { IStore } from '..'
 
-interface IdProps {
-  id: string
+interface IUser {
+  username: string
+  // eslint-disable-next-line camelcase
+  first_name: string
 }
 
-type StoreEditProps = Omit<
-  IStore,
-  'logotype' | 'lat' | 'lng' | 'category' | 'owner_id'
->
-
-const Edit: React.FC = () => {
+const UserEdit: React.FC = () => {
   const history = useHistory()
-  const { id } = useParams<IdProps>()
-  const initialFormData = Object.freeze<StoreEditProps>({
-    id: 0,
-    name: '',
-    slug: '',
-    description: ''
+
+  const initialFormData = Object.freeze<IUser>({
+    username: '',
+    // eslint-disable-next-line camelcase
+    first_name: ''
   })
   const [formData, setFormData] = React.useState(initialFormData)
-
-  React.useEffect(() => {
-    api.get<IStore>('/store/owner/' + id + '/').then(res => {
-      setFormData({
-        ...formData,
-        name: res.data.name,
-        slug: res.data.slug,
-        description: res.data.description
-      })
-      console.log(res.data)
-    })
-  }, [setFormData])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -58,14 +41,12 @@ const Edit: React.FC = () => {
     e.preventDefault()
     console.log(formData)
 
-    api.put(`admin/edit/` + id + '/', {
-      name: formData.name,
-      slug: formData.slug,
-      owner: 3,
-      description: formData.description
+    api.patch(`/user/delete/`, {
+      username: formData.username,
+      first_name: formData.first_name
     })
     history.push({
-      pathname: '/admin/'
+      pathname: '/'
     })
     window.location.reload()
   }
@@ -74,7 +55,7 @@ const Edit: React.FC = () => {
       <CssBaseline />
       <div>
         <Typography component="h1" variant="h5" align="center" sx={{ m: 2 }}>
-          Editar Loja
+          Editar Perfil
         </Typography>
         <form noValidate>
           <Grid container spacing={2}>
@@ -83,11 +64,11 @@ const Edit: React.FC = () => {
                 variant="outlined"
                 required
                 fullWidth
-                id={'name'}
-                label="Nome da loja"
-                name="name"
-                autoComplete="title"
-                value={formData.name}
+                id={'username'}
+                label="Nome de usuário"
+                name="username"
+                autoComplete="username"
+                value={formData.username}
                 onChange={handleChange}
               />
             </Grid>
@@ -111,27 +92,12 @@ const Edit: React.FC = () => {
                 variant="outlined"
                 required
                 fullWidth
-                id={'slug'}
-                label="slug"
-                name="slug"
-                autoComplete="slug"
-                value={formData.slug}
+                id={'firstName'}
+                label="Primeiro nome"
+                name="first_name"
+                autoComplete="firstName"
+                value={formData.first_name}
                 onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id={'description'}
-                label="Descrição"
-                name="description"
-                autoComplete="description"
-                value={formData.description}
-                onChange={handleChange}
-                multiline
-                rows={8}
               />
             </Grid>
             <Grid item xs={12} alignContent="center">
@@ -142,7 +108,7 @@ const Edit: React.FC = () => {
                 color="primary"
                 onClick={handleSubmit}
               >
-                Editar loja
+                Editar Perfil
               </Button>
             </Grid>
           </Grid>
@@ -152,4 +118,4 @@ const Edit: React.FC = () => {
   )
 }
 
-export default Edit
+export default UserEdit
