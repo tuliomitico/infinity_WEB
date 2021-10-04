@@ -1,7 +1,7 @@
 import axios from 'axios'
 import AuthService from './AuthService'
 
-const baseURL = 'http://localhost:8000'
+const baseURL = 'https://evening-sands-20075.herokuapp.com'
 
 const api = axios.create({
   baseURL
